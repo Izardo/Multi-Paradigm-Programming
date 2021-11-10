@@ -103,7 +103,7 @@ void printShop(struct Shop *s) //added pointer
 void displayMenu()
 {
     // fflush(stdin); // might not need this
-    printf("-------------------");
+    printf("\n-------------------");
     printf("\nSHOP MENU\n");
     printf("-------------------");
     printf("\nOption 1\n");
@@ -114,17 +114,17 @@ void displayMenu()
     printf("-------------------\n");
 }
 // Return to menu.
-// void toMenu()
-// {   
-//     fflush(stdin);
-//     char menu;
-//     printf("----------------------------\n");
-//     printf("To view menu press any key.");
-//     scanf("%c", &menu);
-//     if (menu){
-//         displayMenu();
-//     }
-// }
+void toMenu()
+{   
+    // fflush(stdin); 
+    char menu;
+    printf("----------------------------\n");
+    printf("To view menu press y.");
+    scanf("%c", &menu);
+    if (menu == 'y'){ // single quotes refers to value in a, while double refers to memory address
+        displayMenu();
+    }
+}
 // Main program.
 int main(void)
 {
@@ -140,7 +140,7 @@ int main(void)
         if (choice == 1){
             printf("Shop Information\n");
             printShop(&shop);
-            displayMenu();
+            toMenu();
         }
     }
 };
