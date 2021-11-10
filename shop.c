@@ -52,6 +52,7 @@ void printCustomer(struct Customer c)
     };
 };
 
+// Struct to create and stock shop
 struct Shop createAndStockShop() 
 {
     struct Shop shop = { 200 };
@@ -62,6 +63,7 @@ struct Shop createAndStockShop()
     ssize_t read;
 
     fp = fopen("stock.csv", "r");
+    
     if (fp == NULL)
         exit(EXIT_FAILURE);
 
@@ -87,37 +89,58 @@ struct Shop createAndStockShop()
 
 }
 
-void printShop(struct Shop s)
+void printShop(struct Shop *s) //added pointer
 {
-    printf("SHOP CASH FLOAT: €%.2f\n", s.cash);
-    for (int i = 0; i < s.index; i++)
+    printf("SHOP CASH FLOAT: €%.2f\n", s->cash);
+    for (int i = 0; i < s->index; i++)
     {   
         printf("------------------------------\n");
-        printProduct(s.stock[i].product);
-        printf("QUANTITY AVAILABLE: %d\n", s.stock[i].quantity);
+        printProduct(s->stock[i].product);
+        printf("QUANTITY AVAILABLE: %d\n", s->stock[i].quantity);
     }
 }
-
+// Display menu.
+void displayMenu()
+{
+    // fflush(stdin); // might not need this
+    printf("-------------------");
+    printf("\nSHOP MENU\n");
+    printf("-------------------");
+    printf("\nOption 1\n");
+    printf("\nOption 2\n");
+    printf("\nOption 3\n");
+    printf("-------------------");
+    printf("\nPress 0 to Exit\n");
+    printf("-------------------\n");
+}
+// Return to menu.
+// void toMenu()
+// {   
+//     fflush(stdin);
+//     char menu;
+//     printf("----------------------------\n");
+//     printf("To view menu press any key.");
+//     scanf("%c", &menu);
+//     if (menu){
+//         displayMenu();
+//     }
+// }
+// Main program.
 int main(void)
 {
-    // struct Customer isabella = {"Isabella", 100.0};
-    // // printf("Customer's name: %s\n", Isabella.name);
-    
-    // struct Product coke = {"CAN COKE", 1.10};
-    // // printProduct(coke);
-    // // printf("Product: %s\nPrice: %.2f\n", coke.name, coke.price);
-    
-    // struct Product bread = { "Bread", 0.7 };
-    
-    // struct ProductStock cokeStock = { coke, 20 };
-    // struct ProductStock breadStock = { bread, 2 };
-    
-    // isabella.shoppingList[isabella.index++] = cokeStock;
-    // isabella.shoppingList[isabella.index++] = breadStock;
-    // printCustomer(isabella);
-    // // printf("%s QUANTITY: %d\n", cokeStock.product.name, cokeStock.quantity);
-    
-    struct Shop shop = createAndStockShop();
-    printShop(shop);
+    displayMenu();
 
+    struct Shop shop = createAndStockShop();
+
+    int choice = 5;
+    while (choice != 0){
+        printf("\nPlease select a menu option: ");
+        scanf(" %d", &choice); // looks for input
+
+        if (choice == 1){
+            printf("Shop Information\n");
+            printShop(&shop);
+            displayMenu();
+        }
+    }
 };
