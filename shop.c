@@ -54,26 +54,32 @@ void printCustomer(struct Customer c)
 
 // Struct to create and stock shop
 struct Shop createAndStockShop() 
-{
-    struct Shop shop = { 200 };
-    
+{    
     FILE * fp;
     char * line = NULL;
     size_t len = 0;
     ssize_t read;
 
-    fp = fopen("stock.csv", "r");
+    fp = fopen("csv_files/stock.csv", "r");
     
     if (fp == NULL)
         exit(EXIT_FAILURE);
 
+    // Gets cash balance from csv
+    read = getline(&line, &len, fp);
+    float cash = atof(line);
+    printf("CASH IN SHOP IS %.2f\n", cash);
+    
+    struct Shop shop = { cash };
+
+    // String tokeniser method
     while ((read = getline(&line, &len, fp)) != -1) {
         // printf("Retrieved line of length %zu:\n", read);
         char *n = strtok(line, ",");
         char *p = strtok(NULL, ",");
         char *q = strtok(NULL, ",");
-        double price = atof(p); // converts to floating point data type
-        int quantity = atoi(q); // converts to integer data type
+        double price = atof(p); // converts to floating point
+        int quantity = atoi(q); // converts to integer
         char *name = malloc(sizeof(char) * 50); // Dynamcally allocated new memory for holding product name
         strcpy(name, n); // makes copy of data stored in n
 
@@ -116,7 +122,8 @@ void displayMenu()
 // Return to menu.
 void toMenu()
 {   
-    // fflush(stdin); 
+    // Flush input.
+    fflush(stdin); 
     char menu;
     printf("----------------------------\n");
     printf("To view menu press y.");
@@ -128,11 +135,11 @@ void toMenu()
 // Main program.
 int main(void)
 {
+    fflush(stdin)
     displayMenu();
-
     struct Shop shop = createAndStockShop();
-
-    int choice = 5;
+    
+    int choice = -1;
     while (choice != 0){
         printf("\nPlease select a menu option: ");
         scanf(" %d", &choice); // looks for input
@@ -142,5 +149,5 @@ int main(void)
             printShop(&shop);
             toMenu();
         }
-    }
+    } //Put lengthy code in own method.
 };
