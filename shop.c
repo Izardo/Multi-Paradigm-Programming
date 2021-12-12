@@ -60,6 +60,7 @@ struct Shop createAndStockShop()
     size_t len = 0;
     ssize_t read;
 
+    // Opens csv with stock & shop value
     fp = fopen("csv_files/stock.csv", "r");
     
     if (fp == NULL)
@@ -94,6 +95,32 @@ struct Shop createAndStockShop()
     return shop;
 
 }
+struct Customer customerOrderCSV()
+{
+    FILE * fp;
+    char * line = NULL;
+    size_t len = 0;
+    ssize_t read;
+
+    fp = fopen("customer1.csv", "r");
+    if (fp == NULL)
+        exit(EXIT_FAILURE);
+
+    read = getline(&line, &len, fp);
+    char *a = strtok(line, ",");
+    char *b = strtok(NULL, ",");
+    char *custName = malloc(sizeof(char) * 50);
+    double custBudget = atof(b);
+    strcpy(custName, a);
+    struct Customer customer = { custName, custBudget }; 
+
+    //struct ProductStock array[] = { StockA, StockB }
+    while ((read = getline(&line, &len, fp)) != -1) {
+        // code here
+    }
+    // return customer struct
+    return customer;
+}
 
 void printShop(struct Shop *s) //added pointer
 {
@@ -112,8 +139,8 @@ void displayMenu()
     printf("\n-------------------");
     printf("\nSHOP MENU\n");
     printf("-------------------");
-    printf("\nOption 1\n");
-    printf("\nOption 2\n");
+    printf("\nView shop stock, press 1\n");
+    printf("\nMake an order, press 2\n");
     printf("\nOption 3\n");
     printf("-------------------");
     printf("\nPress 0 to Exit\n");
@@ -131,11 +158,21 @@ void toMenu()
     if (menu == 'y'){ // single quotes refers to value in a, while double refers to memory address
         displayMenu();
     }
+};
+double find(struct Shop s, char* name) 
+{
+    for (int i = 0; i < s.index; i++)
+    {
+        if (strcmp(name, s.stock[i].product.name) == 0){
+            return s.stock[i].product.price;
+        }
+    }
+    return -1;
 }
 // Main program.
 int main(void)
 {
-    fflush(stdin)
+    fflush(stdin);
     displayMenu();
     struct Shop shop = createAndStockShop();
     
@@ -145,9 +182,20 @@ int main(void)
         scanf(" %d", &choice); // looks for input
 
         if (choice == 1){
-            printf("Shop Information\n");
+            printf("Shop Stock & Status\n");
+            // Prints stock items & shop balance
             printShop(&shop);
             toMenu();
+        }
+        else if (choice == 2){
+            printf("Make an order\n");
+            struct Customer customer = customerOrderCSV();
+            // Check if customer has enough cash to purchase order
+            
+            if (customer.budget == 0) {
+                printf("There is insufficient funds in your account.");
+                toMenu();
+            }
         }
     } //Put lengthy code in own method.
 };
