@@ -1,8 +1,8 @@
 ''' 
-Student: Isabella Doyle
-
-Module: Multi-paradigm Programming 2021
-
+Student: 
+    Isabella Doyle
+Module: 
+    Multi-paradigm Programming 2021
 Program:
     A Shop in procedural program style in python
     Difference: in procedeural the data is seperate from the functions
@@ -77,7 +77,6 @@ def read_customer(file_path):
         Returns:
             c : customer budget - float
     '''
-
     # Opens the csv file.
     with open(file_path) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
@@ -110,53 +109,90 @@ def print_customer(c, s):
         c : Customer - an instance of the Customer class
         s : Shop - an instance of the Shop class
     '''
-    
     print(f'\nCUSTOMER NAME: {c.name} \nCUSTOMER BUDGET: {c.budget}')
-    
     # Variable for storing the total of shopping list.
     total = 0
-    
     # Loop over each item in shopping list. 
     for item in c.shopping_list:
-        
         # Loop over products.
         for p in s.stock:
-
             # Check if items exist.
             if item.product.name == p.product.name:
                 print_product(p.product) # Prints each product in customer shopping list
                 print(f'{c.name} ORDERS {item.quantity} OF ABOVE PRODUCT')
                 cost = item.quantity * p.product.price
-                print(f'THE COST TO {c.name} WILL BE €{cost}')
-        
-        # Calculate total cost for items.
+                print(f'The cost to {c.name} will be €{cost}') 
+        # Add cost to total.
         total += cost
-    
     # Prints total cost.
     print(f"\nTOTAL: €{total}")
-
     # Prints budget after purchase.
-    print(f"{c.name} BUDGET AFTER PURCHASE WILL BE €{c.budget}")
-
+    print(f"{c.name} budget after purchase will be €{c.budget}\n")
     return total
 
 def process_order(s, c):
     '''
         Function:
-            Processes the customer's order by checking the stock & the customer's budget. 
+            Process the customer's order by checking the stock & the customer's budget. 
             If the transaction is successful, the shop's stock & budget is updated. 
         Params:
             s : an instance of Shop class
             c : an instance of Customer class
     '''
+    print("\n------------------------")
+    print("Processing your order...")
+    print("------------------------\n")
+    print("See overview below before proceeding with transaction: \n")
+    
+    # Initiate variable to hold total sum for shopping.
+    total = 0
+    
     # Loop over items in customer's shopping list
     for i in c.shopping_list:
+        
         # Check if item exists in shop.
-        product = find_product(s, i.product.name)
-        if product == True:
-            print("Product exists.")
+        prod = find_product(s, i.product.name)
+        
+        if prod == 1:
+            # Counts order price.
+            for p in s.stock:
+                # Creates list for customer of products available & costs.
+                if i.product.name == p.product.name:
+                    print_product(p.product) # Prints each product in customer shopping list
+                    print(f'{c.name} ORDERS {i.quantity} OF ABOVE PRODUCT')
+                    
+                    # Check availability of stock.
+                    if i.quantity <= p.quantity:
+                        cost = i.quantity * p.product.price
+                        print(f'COST TO {c.name} IS €{cost}')
+                        # Update shop balance. 
+                        p.quantity -= i.quantity
+                        
+                        # Add cost to total.
+                        total += cost
+                    else:
+                        print(f"Sorry, we do not have {i.quantity} units of this product available at this time.")
         else:
-            print("NO EXIST")
+            print(f"\nSorry, we do not stock the following item: {i.product.name}")
+
+    # Finalise order.
+    print(f"\nTOTAL: €{total}")
+    # Prints budget after purchase.
+    prov_budget = c.budget - total
+    print(f"BUDGET AFTER PURCHASE WILL BE: €{prov_budget}\n")
+    # Takes input from user to proceed with order.
+    proceed = input("Are you happy to complete transaction? (y/n)\n")
+    if proceed == "y":
+        # Checks if customer has sufficient funds. 
+        if c.budget > total:
+            # Updates customer's budget. 
+            c.budget -= total
+            print("\nTransaction successful.")
+            print(f"Your new budget: €{c.budget}\n")
+            # Update shop balance. 
+            s.cash += total     
+        else:
+            print("\nDue to insufficient funds transaction CANNOT BE NOT COMPLETED.\n")
 
 def find_product(s, item):
     '''
@@ -170,9 +206,8 @@ def find_product(s, item):
     '''
     for i in s.stock:
         if i.product.name == item:
-            return True
-        else:
-            return False
+            return 1
+    return None
 
 def print_shop(s):
     '''
