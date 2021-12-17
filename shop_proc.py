@@ -1,7 +1,12 @@
-''' A Shop in procedural program style in python
+''' 
+Student: Isabella Doyle
+
+Module: Multi-paradigm Programming 2021
+
+Program:
+    A Shop in procedural program style in python
     Difference: in procedeural the data is seperate from the functions
     in oop they exist in one construct; the class.
-    
 '''
 
 from dataclasses import dataclass, field
@@ -34,9 +39,14 @@ class Customer:
     budget: float = 0.0
     shopping_list: List[ProductStock] = field(default_factory=list) # creates empty list
 
-# Function to populate shop with data from csv file.
 def create_and_stock_shop():
-    
+    '''
+        Function: 
+            Populates the shop with data from csv file.
+        Returns:
+            s : an instance of the shop class
+    '''
+
     # Instantiate an instance of Shop class.
     s = Shop()
     
@@ -57,17 +67,23 @@ def create_and_stock_shop():
     
     return s    # Instance of Shop class
 
-# Function to read in customer csv. 
+
 def read_customer(file_path):
-    
+    '''
+        Function:
+            Reads in customer csv. 
+        Params: 
+            file_path : csv file name - str
+        Returns:
+            c : customer budget - float
+    '''
+
     # Opens the csv file.
     with open(file_path) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
-        
         # Reads in first row (budget) and assigns it to variable c. 
         first_row = next(csv_reader)
         c = Customer(first_row[0], float(first_row[1]))
-        
         # Loops through rows, extracting information to create a shopping list. 
         for row in csv_reader:
             name = row[0]
@@ -75,19 +91,29 @@ def read_customer(file_path):
             p = Product(name)           # Creates product
             ps = ProductStock(p, quantity)
             c.shopping_list.append(ps)
+        return c
         
-        return c 
-        
-# Function to print out product information - product name and price.
 def print_product(p):
+    '''
+        Function:
+            Prints out product information (product name and price).
+        Params: 
+            p : an instance of the Product class
+    '''
     print(f'\nPRODUCT NAME: {p.name} \nPRODUCT PRICE: {p.price}')
 
-# Function to print out customer information - customer name, budget and shopping list.
 def print_customer(c, s):
+    '''
+    Function: 
+        Prints out customer information - customer name, budget and shopping list.
+    Params:
+        c : Customer - an instance of the Customer class
+        s : Shop - an instance of the Shop class
+    '''
     
     print(f'\nCUSTOMER NAME: {c.name} \nCUSTOMER BUDGET: {c.budget}')
     
-    # Variable for storing the total cash price.
+    # Variable for storing the total of shopping list.
     total = 0
     
     # Loop over each item in shopping list. 
@@ -107,10 +133,56 @@ def print_customer(c, s):
         total += cost
     
     # Prints total cost.
-    print(f"\nTOTAL: {total}")
+    print(f"\nTOTAL: €{total}")
 
-# Function to print out shop information - shop balance, products and stock information.        
+    # Prints budget after purchase.
+    print(f"{c.name} BUDGET AFTER PURCHASE WILL BE €{c.budget}")
+
+    return total
+
+def process_order(s, c):
+    '''
+        Function:
+            Processes the customer's order by checking the stock & the customer's budget. 
+            If the transaction is successful, the shop's stock & budget is updated. 
+        Params:
+            s : an instance of Shop class
+            c : an instance of Customer class
+    '''
+    # Loop over items in customer's shopping list
+    for i in c.shopping_list:
+        # Check if item exists in shop.
+        product = find_product(s, i.product.name)
+        if product == True:
+            print("Product exists.")
+        else:
+            print("NO EXIST")
+
+def find_product(s, item):
+    '''
+        Function:
+            Checks if item exists in shop.
+        Params:
+            s : an instance of Shop class
+            item : item in customer's shopping list
+        Returns:
+            Boolean
+    '''
+    for i in s.stock:
+        if i.product.name == item:
+            return True
+        else:
+            return False
+
 def print_shop(s):
+    '''
+    Function: 
+        Prints out shop information - shop balance, products and stock information.
+    Params:
+        s : an instance of the Shop class
+    '''
+
+    # Welcome message & shop balance.
     print("\n--------------------")
     print("WELCOME TO OUR SHOP")
     print("--------------------\n")
@@ -118,36 +190,47 @@ def print_shop(s):
     print("--------------------")
     print("SHOP ITEMS")
     print("--------------------")
-    # Prints out each shop item and its quantity. 
+    
+    # Prints out each shop item and its quantity by calling print_product function.
     for item in s.stock:
         print_product(item.product)
         print(f'The Shop has {item.quantity} of the above\n')
     print("--------------------\n")
 
-# Function to clear screen/console. Adapted from: https://www.delftstack.com/howto/python/python-clear-console/
+# Code adapted from: https://www.delftstack.com/howto/python/python-clear-console/
 def clearConsole():
+    '''
+    Function: 
+        Clears screen/console.
+    '''
     # For windows.
     os.system('cls')
     # For linux/mac
     os.system('clear')
-
-# Main menu. 
+ 
 def displayMenu():
+    ''' 
+        Function:
+            Prints menu.
+    '''
+
     print()
     print("*******************")
     print("Shop Menu")
     print("*******************\n")
     print("Option 1: View Shop and Stock")
-    print("Option 2: Place Order with Shopping List")
+    print("Option 2: Place Order from CSV Shopping List")
     print("Option 3: Live Mode")
     print("Option 4: Back to Menu")
     print("Option 0: Exit Shop\n")
 
-#s = create_and_stock_shop()
-#print_shop(s)
-# Main program.
 if __name__ == '__main__':
-    
+    '''
+        The main program displays the menu. It takes an input from the user and 
+        redirects the program accordingly.
+
+        The while loop breaks when 0 is input by the user.
+    '''
     # Store function in a variable to be accessed later.
     s = create_and_stock_shop()
     
@@ -156,14 +239,17 @@ if __name__ == '__main__':
 
     # Initiates value for while loop. 
     choice = -1
-
+    
     # While loop terminates when 0 is entered.
     while choice != 0:
         choice = int(input("Please choose one of the menu options: \n"))
-    
         if choice == 1:
             print_shop(s)
-
+        elif choice == 2:
+            # Takes input of customer name & creates a string with file path corresponding to customer list.
+            cust_path = "csv_files/" + input("Please state your name associated with the CSV shopping list: ") + ".csv"
+            cust = read_customer(cust_path)
+            process_order(s, cust)
         elif choice == 4:
             displayMenu()
     
