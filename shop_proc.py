@@ -14,25 +14,25 @@ from typing import List
 import csv
 import os # To clear screen.
 
-# Class contains information about the product - product name and price.
+# Class will hold information about the product - product name and price.
 @dataclass
 class Product:
     name: str
     price: float = 0.0
 
-# Class contains information about the product stock - product and quantity. 
+# Class will hold information about the product stock - product and quantity. 
 @dataclass 
 class ProductStock:
     product: Product
     quantity: int
 
-# Class contains information about the shop - cash balance and product stock.
+# Class will hold information about the shop - cash balance and product stock.
 @dataclass 
 class Shop:
     cash: float = 0.0
     stock: List[ProductStock] = field(default_factory=list)
 
-# Class contains information about the customer - name, budget and shopping list. 
+# Class will hold information about the customer - name, budget and shopping list. 
 @dataclass
 class Customer:
     name: str = ""
@@ -101,73 +101,45 @@ def print_product(p):
     '''
     print(f'\nPRODUCT NAME: {p.name} \nPRODUCT PRICE: {p.price}')
 
-def print_customer(c, s):
-    '''
-    Function: 
-        Prints out customer information - customer name, budget and shopping list.
-    Params:
-        c : Customer - an instance of the Customer class
-        s : Shop - an instance of the Shop class
-    '''
-    print(f'\nCUSTOMER NAME: {c.name} \nCUSTOMER BUDGET: {c.budget}')
-    # Variable for storing the total of shopping list.
-    total = 0
-    # Loop over each item in shopping list. 
-    for item in c.shopping_list:
-        # Loop over products.
-        for p in s.stock:
-            # Check if items exist.
-            if item.product.name == p.product.name:
-                print_product(p.product) # Prints each product in customer shopping list
-                print(f'{c.name} ORDERS {item.quantity} OF ABOVE PRODUCT')
-                cost = item.quantity * p.product.price
-                print(f'The cost to {c.name} will be €{cost}') 
-        # Add cost to total.
-        total += cost
-    # Prints total cost.
-    print(f"\nTOTAL: €{total}")
-    # Prints budget after purchase.
-    print(f"{c.name} budget after purchase will be €{c.budget}\n")
-    return total
-
 def process_order(s, c):
     '''
         Function:
+            Prints customer's name, budget and shopping list from csv file.
             Process the customer's order by checking the stock & the customer's budget. 
             If the transaction is successful, the shop's stock & budget is updated. 
         Params:
             s : an instance of Shop class
             c : an instance of Customer class
     '''
+    # Prints banner.
     print("\n------------------------")
     print("Processing your order...")
     print("------------------------\n")
-    print("See overview below before proceeding with transaction: \n")
+    print("Please see overview below before proceeding with transaction: \n")
     
+    # Prints customers name and budget.
+    print(f'\nCUSTOMER NAME: {c.name} \nCUSTOMER BUDGET: {c.budget}')
+
     # Initiate variable to hold total sum for shopping.
     total = 0
     
     # Loop over items in customer's shopping list
     for i in c.shopping_list:
-        
         # Check if item exists in shop.
         prod = find_product(s, i.product.name)
-        
         if prod == 1:
             # Counts order price.
             for p in s.stock:
                 # Creates list for customer of products available & costs.
                 if i.product.name == p.product.name:
                     print_product(p.product) # Prints each product in customer shopping list
-                    print(f'{c.name} ORDERS {i.quantity} OF ABOVE PRODUCT')
-                    
+                    print(f'{c.name} ORDERS {i.quantity} OF ABOVE PRODUCT')  
                     # Check availability of stock.
                     if i.quantity <= p.quantity:
                         cost = i.quantity * p.product.price
                         print(f'COST TO {c.name} IS €{cost}')
                         # Update shop balance. 
                         p.quantity -= i.quantity
-                        
                         # Add cost to total.
                         total += cost
                     else:
@@ -180,15 +152,17 @@ def process_order(s, c):
     # Prints budget after purchase.
     prov_budget = c.budget - total
     print(f"BUDGET AFTER PURCHASE WILL BE: €{prov_budget}\n")
-    # Takes input from user to proceed with order.
+    # Takes input from user to proceed with transaction.
     proceed = input("Are you happy to complete transaction? (y/n)\n")
     if proceed == "y":
         # Checks if customer has sufficient funds. 
         if c.budget > total:
             # Updates customer's budget. 
             c.budget -= total
-            print("\nTransaction successful.")
-            print(f"Your new budget: €{c.budget}\n")
+            print("\n--------------------------------------------------")
+            print("Transaction successful. Thank you for your custom.")
+            print(f"Your new budget: €{c.budget}")
+            print("--------------------------------------------------\n")
             # Update shop balance. 
             s.cash += total     
         else:
@@ -216,7 +190,6 @@ def print_shop(s):
     Params:
         s : an instance of the Shop class
     '''
-
     # Welcome message & shop balance.
     print("\n--------------------")
     print("WELCOME TO OUR SHOP")
@@ -233,7 +206,7 @@ def print_shop(s):
     print("--------------------\n")
 
 # Code adapted from: https://www.delftstack.com/howto/python/python-clear-console/
-def clearConsole():
+def clear_console():
     '''
     Function: 
         Clears screen/console.
@@ -248,11 +221,10 @@ def displayMenu():
         Function:
             Prints menu.
     '''
-
     print()
-    print("*******************")
+    print("-------------------")
     print("Shop Menu")
-    print("*******************\n")
+    print("-------------------\n")
     print("Option 1: View Shop and Stock")
     print("Option 2: Place Order from CSV Shopping List")
     print("Option 3: Live Mode")
@@ -279,12 +251,15 @@ if __name__ == '__main__':
     while choice != 0:
         choice = int(input("Please choose one of the menu options: \n"))
         if choice == 1:
+            clear_console()
             print_shop(s)
         elif choice == 2:
+            clear_console()
             # Takes input of customer name & creates a string with file path corresponding to customer list.
-            cust_path = "csv_files/" + input("Please state your name associated with the CSV shopping list: ") + ".csv"
+            cust_path = "csv_files/" + input("Please state the name associated with the CSV shopping list: ") + ".csv"
             cust = read_customer(cust_path)
             process_order(s, cust)
+            displayMenu()
         elif choice == 4:
             displayMenu()
     
