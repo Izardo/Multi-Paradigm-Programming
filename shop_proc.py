@@ -143,9 +143,9 @@ def process_order(s, c):
                         # Add cost to total.
                         total += cost
                     else:
-                        print(f"Sorry, we do not have {i.quantity} units of this product available at this time.")
+                        print(f"! Sorry, we do not have {i.quantity} units of this product available at this time.")
         else:
-            print(f"\nSorry, we do not stock the following item: {i.product.name}")
+            print(f"\n!!! Sorry, we do not stock the following item: {i.product.name}")
 
     # Finalise order.
     print(f"\nTOTAL: €{total}")
@@ -155,18 +155,58 @@ def process_order(s, c):
     # Takes input from user to proceed with transaction.
     proceed = input("Are you happy to complete transaction? (y/n)\n")
     if proceed == "y":
-        # Checks if customer has sufficient funds. 
-        if c.budget > total:
-            # Updates customer's budget. 
-            c.budget -= total
-            print("\n--------------------------------------------------")
-            print("Transaction successful. Thank you for your custom.")
-            print(f"Your new budget: €{c.budget}")
-            print("--------------------------------------------------\n")
-            # Update shop balance. 
-            s.cash += total     
-        else:
-            print("\nDue to insufficient funds transaction CANNOT BE NOT COMPLETED.\n")
+        if total == 0:
+            print("\n--------------------------------------------------------")
+            print("There is nothing in your basket to purchase.")
+            print("--------------------------------------------------------\n")
+        else:    
+            # Checks if customer has sufficient funds. 
+            if c.budget > total:
+                # Updates customer's budget. 
+                c.budget -= total
+                print("\n--------------------------------------------------")
+                print("Transaction successful. Thank you for your custom.")
+                print(f"Your new budget: €{c.budget}")
+                print("--------------------------------------------------\n")
+                # Update shop balance. 
+                s.cash += total     
+            else:
+                print("--------------------------------------------------------")
+                print("\nSorry, there are insufficient funds in your account and") 
+                print("the transaction CANNOT be completed at this time.\n")
+                print("--------------------------------------------------------")
+
+
+def live_mode(s):
+    '''
+    Function: 
+        Allows customer to purchase items in realtime.
+
+    '''
+    print("\nPlease select items from our product list below: ")
+    print_shop(s)
+
+    # Gets user's name & budget & creates instance of customer class.
+    c_name = input("Please enter your name to start your order: ")
+    c_budget = float(input("\nPlease specify your budget: "))
+    print("\n----------------------\n")
+    print(f"Thank you {c_name}, you have a budget of {c_budget}.")
+    cust = Customer(c_name, c_budget)
+    print("\n----------------------\n")
+    print("Please specify the items you wish to purchase: \n")
+    
+    # Creates customer shopping list.
+    choice = 0
+    while choice != "n":
+        item = input("\nEnter product name: ")
+        quantity = int(input("\nQuantity: "))
+        print("Item added to your basket.")
+        p = Product(item)
+        stock = ProductStock(p, quantity)
+        cust.shopping_list.append(stock)
+        choice = input("\nAdd another product? (y/n)\n")
+
+    return cust
 
 def find_product(s, item):
     '''
@@ -257,9 +297,14 @@ if __name__ == '__main__':
             clear_console()
             # Takes input of customer name & creates a string with file path corresponding to customer list.
             cust_path = "csv_files/" + input("Please state the name associated with the CSV shopping list: ") + ".csv"
+            # print("Sorry we cannot find a shopping list associated with that name.")
             cust = read_customer(cust_path)
             process_order(s, cust)
             displayMenu()
+        elif choice == 3:
+            clear_console()
+            cust = live_mode(s)
+            process_order(s, cust)
         elif choice == 4:
             displayMenu()
     
